@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const register = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -14,9 +15,20 @@ export const register = async (req: Request, res: Response) => {
 
     user = new User({ name, email, password });
 
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
     await user.save();
 
-    res.status(201).json({ msg: "User registered" });
+    // Generate JWT access token
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
+
+    res.status(201).json({ msg: "User registered", accessToken });
   } catch (err: any) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -39,17 +51,14 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const payload = {
-      user: {
-        id: user.id,
-      },
-    };
+    // Generate JWT access token
+    const accessToken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET as string,
+      { expiresIn: "1h" }
+    );
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET as string, {
-      expiresIn: "1h",
-    });
-
-    res.json({ token });
+    res.json({ accessToken });
   } catch (err: any) {
     console.error(err.message);
     res.status(500).send("Server error");
