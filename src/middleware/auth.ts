@@ -4,7 +4,7 @@ import { DecodedToken } from "../types/types"; // Update path as per your projec
 
 export const auth = (req: Request, res: Response, next: NextFunction) => {
   // Extract token from Authorization header
-  const token = req.header("Authorization")?.replace("Bearer ", "");
+  const token = req.header("token")?.replace("Bearer ", "");
 
   if (!token) {
     return res.status(401).json({ msg: "No token, authorization denied" });
