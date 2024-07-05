@@ -35,3 +35,26 @@ export const createProduct = async (req: Request, res: Response) => {
     res.status(500).send("Server error");
   }
 };
+
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+    res.status(200).json(product);
+  } catch (err: any) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+};
+
+export const getProducts = async (req: Request, res: Response) => {
+  try {
+    const products = await Product.find();
+    res.status(200).json(products);
+  } catch (err: any) {
+    console.error(err.message);
+    res.status(500).send("Server error");
+  }
+};
