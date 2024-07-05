@@ -15,13 +15,11 @@ export const register = async (req: Request, res: Response) => {
 
     user = new User({ name, email, password });
 
-    // Hash the password before saving
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(password, salt);
 
     await user.save();
 
-    // Generate JWT access token
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET as string,
@@ -51,7 +49,6 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    // Generate JWT access token
     const accessToken = jwt.sign(
       { userId: user._id, email: user.email },
       process.env.JWT_SECRET as string,

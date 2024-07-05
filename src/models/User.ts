@@ -14,7 +14,6 @@ const userSchema = new Schema<UserDocument>({
   password: { type: String, required: true },
 });
 
-// Compare candidate password with stored hashed password
 userSchema.methods.comparePassword = async function (
   candidatePassword: string
 ): Promise<boolean> {

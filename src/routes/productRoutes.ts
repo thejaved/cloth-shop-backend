@@ -1,10 +1,8 @@
 import express from "express";
-import { createProduct } from "../controllers/productController";
-import { auth } from "../middleware/auth";
+import { createProduct, upload } from "../controllers/productController";
 
 const router = express.Router();
 
-// POST /api/products/create
-router.post("/create", auth, createProduct);
+router.post("/create", upload.single("image"), createProduct);
 
 export default router;

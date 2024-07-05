@@ -1,17 +1,34 @@
+import path from "path";
+import multer from "multer";
 import { Request, Response } from "express";
-import Product from "../models/Product";
+import Product, { ProductDocument } from "../models/Product";
+import { uploadImageToFirebase } from "../services/firebase";
+
+const storage = multer.memoryStorage();
+export const upload = multer({ storage });
 
 export const createProduct = async (req: Request, res: Response) => {
-  const { name, description, price } = req.body;
+  const { name, description, price, ratingCount, inStockCount } = req.body;
 
   try {
-    // Create new product instance
-    const product = new Product({ name, description, price });
+    let imageUrl: string | undefined;
+    if (req.file && req.file.buffer) {
+      const buffer = req.file.buffer;
+      const filename = `${Date.now()}_${path.basename(req.file.originalname)}`;
+      imageUrl = await uploadImageToFirebase(buffer, filename);
+    }
 
-    // Save product to database
+    const productData: Partial<ProductDocument> = {
+      name,
+      description,
+      price,
+      ratingCount,
+      inStockCount,
+      imageUrl,
+    };
+
+    const product = new Product(productData);
     await product.save();
-
-    // Respond with success message
     res.status(201).json({ msg: "Product created successfully", product });
   } catch (err: any) {
     console.error(err.message);

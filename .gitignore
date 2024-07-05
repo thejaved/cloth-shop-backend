@@ -2,3 +2,4 @@ node_modules
 package-lock.json
 .env
 yarn.lock
+src/config/serviceAccountKey.json
