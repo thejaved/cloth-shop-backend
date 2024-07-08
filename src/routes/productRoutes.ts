@@ -5,14 +5,13 @@ import {
   getProducts,
   upload,
 } from "../controllers/productController";
-import { auth } from "../middleware/auth";
 
 const router = express.Router();
 
 router.post("/create", upload.single("image"), createProduct);
 
-router.get("/", auth, getProducts);
+router.get("/", getProducts);
 
-router.get("/:id", auth, getProductById);
+router.get("/:id", getProductById);
 
 export default router;
